@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en" data-repo="odacrem64-cloud/desktopity">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Desktopity — a little smiley who lives on your desktop</title>
+<meta name="description" content="Desktopity is a tiny smiley-face buddy for Windows. He floats on your desktop, talks out loud, listens, gets moods, and is maybe a little bit evil. Free download.">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Grandstander:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --teal: #0E7C7B;      /* the desktop */
+    --teal-deep: #0A5F5E;
+    --yellow: #F7D21A;    /* him */
+    --box: #B9844A;       /* his box */
+    --plum: #2B1D3A;      /* ink, and his secret side */
+    --mist: #E6F0EE;      /* page below the desktop */
+    --white: #FFFFFF;
+    --radius-s: 6px;
+    --radius-l: 14px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--mist); color: var(--plum);
+    font: 400 18px/1.6 "Atkinson Hyperlegible", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; border-radius: 4px; }
+
+  /* ---------- the desktop (hero) ---------- */
+  .desk {
+    position: relative; min-height: min(760px, 100svh); overflow: hidden;
+    background:
+      radial-gradient(1200px 600px at 75% 30%, #13908F 0%, transparent 60%),
+      var(--teal);
+    color: var(--white);
+    display: grid; grid-template-rows: 1fr auto;
+  }
+  .desk-inner {
+    width: min(1120px, 100% - 32px); margin: 0 auto;
+    display: grid; grid-template-columns: 1.05fr 0.95fr; align-items: center; gap: 24px;
+    padding: 56px 0 40px;
+  }
+  .desk h1 {
+    font: 800 clamp(44px, 6.2vw, 80px)/0.98 "Grandstander", system-ui, sans-serif;
+    letter-spacing: -0.01em; margin: 0 0 22px; max-width: 11ch;
+    text-wrap: balance;
+  }
+  .desk .lede { font-size: 20px; line-height: 1.55; max-width: 34ch; margin: 0 0 32px; color: #E3F4F3; }
+  .dl {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--yellow); color: var(--plum); text-decoration: none;
+    font: 800 20px/1 "Grandstander", system-ui, sans-serif;
+    padding: 18px 26px 17px; border-radius: var(--radius-l);
+    box-shadow: 0 5px 0 #B99A0C;
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .dl:hover { transform: translateY(-1px); box-shadow: 0 6px 0 #B99A0C; }
+  .dl:active { transform: translateY(4px); box-shadow: 0 1px 0 #B99A0C; }
+  .dl svg { width: 22px; height: 22px; }
+  .dl-note { margin: 16px 0 0; font-size: 15px; color: #CDE9E7; max-width: 40ch; }
+  .dl-note a { color: var(--white); }
+
+  /* stage where he lives */
+  .stage { position: relative; height: 440px; touch-action: none; }
+  .icons { position: absolute; top: 18px; right: 0; display: grid; gap: 22px; justify-items: center; }
+  .icon { width: 96px; text-align: center; overflow-wrap: anywhere; font-size: 13px; line-height: 1.25; color: #F2FBFA; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+  .icon svg { width: 40px; height: 40px; display: block; margin: 0 auto 6px; }
+  .hint {
+    position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
+    font-size: 14px; color: #BFE3E1; white-space: nowrap; opacity: 0; transition: opacity .6s ease;
+  }
+  .hint.show { opacity: 1; }
+  #buddy { position: absolute; left: 50%; top: 46%; width: 210px; height: 210px; margin: -105px 0 0 -105px; cursor: grab; will-change: transform; }
+  #buddy svg { width: 100%; height: 100%; overflow: visible; display: block; }
+  #box { position: absolute; left: 50%; top: 46%; width: 300px; height: 266px; margin: -38px 0 0 -150px; pointer-events: none; will-change: transform, opacity; }
+  #boxBack { position: absolute; left: 50%; top: 46%; width: 300px; height: 266px; margin: -38px 0 0 -150px; pointer-events: none; }
+  #flapL { transform-origin: 12px 24px; } #flapR { transform-origin: 128px 24px; }
+  .say {
+    position: absolute; left: 50%; top: calc(46% - 170px); transform: translate(-50%, 6px);
+    background: var(--plum); color: var(--white); font-size: 16px; line-height: 1.35;
+    padding: 9px 14px 10px; border-radius: 10px; max-width: 260px; text-align: center;
+    opacity: 0; transition: opacity .18s ease, transform .2s ease; pointer-events: none;
+  }
+  .say.show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* the taskbar */
+  .taskbar {
+    background: rgba(10, 40, 40, 0.55); backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,0.12);
+  }
+  .taskbar-inner {
+    width: min(1120px, 100% - 32px); margin: 0 auto; height: 52px;
+    display: flex; align-items: center; gap: 18px; font-size: 15px; color: #D4ECEA;
+  }
+  .tray-face { width: 26px; height: 26px; flex: none; }
+  .taskbar nav { display: flex; gap: 22px; margin-left: auto; }
+  .taskbar nav a { text-decoration: none; color: #E8F6F5; }
+  .taskbar nav a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .clock { font-variant-numeric: tabular-nums; color: #E8F6F5; }
+
+  /* ---------- below the desktop ---------- */
+  main { width: min(1120px, 100% - 32px); margin: 0 auto; }
+  section { padding: 88px 0 8px; }
+  h2 {
+    font: 800 clamp(32px, 4vw, 46px)/1.05 "Grandstander", system-ui, sans-serif;
+    margin: 0 0 14px; letter-spacing: -0.005em; max-width: 20ch;
+  }
+  .sub { margin: 0 0 40px; max-width: 58ch; font-size: 19px; }
+
+  /* traits: each one marked by the face he makes */
+  .traits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 34px 56px; list-style: none; padding: 0; margin: 0; }
+  .traits li { display: grid; grid-template-columns: 64px 1fr; gap: 18px; align-items: start; }
+  .traits svg { width: 64px; height: 64px; }
+  .traits h3 { font: 800 22px/1.2 "Grandstander", system-ui, sans-serif; margin: 6px 0 6px; }
+  .traits p { margin: 0; max-width: 42ch; }
+
+  /* opening steps: a real sequence, so it's numbered */
+  .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; counter-reset: s; list-style: none; padding: 0; margin: 0; }
+  .steps li { position: relative; padding-top: 58px; }
+  .steps li::before {
+    counter-increment: s; content: counter(s);
+    position: absolute; top: 0; left: 0; width: 42px; height: 42px; border-radius: 50%;
+    background: var(--plum); color: var(--yellow); display: grid; place-items: center;
+    font: 800 20px/1 "Grandstander", system-ui, sans-serif;
+  }
+  .steps h3 { font: 800 21px/1.25 "Grandstander", system-ui, sans-serif; margin: 0 0 8px; }
+  .steps p { margin: 0 0 16px; }
+  .shot {
+    background: var(--white); border-radius: var(--radius-s); padding: 16px 16px 14px;
+    border: 1px solid #C9DCD9; font-size: 14px; line-height: 1.45;
+  }
+  .shot.win { background: #0F5F9E; color: #fff; border-color: #0F5F9E; }
+  .shot .t { font-size: 17px; font-weight: 700; margin: 0 0 6px; }
+  .shot .lnk { text-decoration: underline; }
+  .shot .btns { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+  .shot .b { border: 1px solid rgba(255,255,255,.7); padding: 4px 14px; border-radius: 3px; }
+  .shot .b.hi { background: #fff; color: #0F5F9E; }
+  .shot .file { display: flex; align-items: center; gap: 10px; }
+  .shot .file img { width: 30px; height: 30px; }
+  .shot .ring { outline: 2px dashed var(--plum); outline-offset: 3px; border-radius: 3px; }
+
+  .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; }
+  .facts h3 { font: 800 21px/1.25 "Grandstander", system-ui, sans-serif; margin: 0 0 8px; }
+  .facts p { margin: 0; max-width: 34ch; }
+
+  .again {
+    margin: 96px 0 0; padding: 48px 40px; border-radius: var(--radius-l);
+    background: var(--teal); color: var(--white);
+    display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  }
+  .again h2 { margin: 0; color: var(--white); max-width: 18ch; }
+
+  footer { width: min(1120px, 100% - 32px); margin: 0 auto; padding: 48px 0 56px; font-size: 15px; color: #4A3D57; }
+  footer p { margin: 0 0 8px; max-width: 80ch; }
+
+  @media (max-width: 860px) {
+    .desk-inner { grid-template-columns: 1fr; padding-top: 40px; text-align: left; }
+    .stage { height: 360px; order: -1; }
+    .icons { display: none; }
+    .traits, .steps, .facts { grid-template-columns: 1fr; }
+    .taskbar nav { display: none; }
+    section { padding-top: 64px; }
+    .again { padding: 36px 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .dl, .say, .hint { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="desk">
+  <div class="desk-inner">
+    <div>
+      <h1>A little smiley who lives on your desktop.</h1>
+      <p class="lede">Desktopity floats around your screen, talks out loud, listens when you speak, and has moods of his own. He's sweet. Mostly.</p>
+      <a class="dl" id="download" href="#" data-file="Desktopity-Windows.zip">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0-4.5-4.5M12 14l4.5-4.5M4 17v3h16v-3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Download for Windows
+      </a>
+      <p class="dl-note">Free, for Windows 10 and 11. A 430 MB zip — he grabs his 2 GB brain on first launch. <a href="#open">How to open him</a></p>
+    </div>
+
+    <div class="stage" id="stage" aria-label="Desktopity, live. Move your mouse near him, rub over him to pet him, or click him.">
+      <svg id="boxBack" viewBox="0 0 140 124" aria-hidden="true">
+        <path d="M12,24 L128,24 L121,15 L19,15 Z" fill="#3A2412"/>
+      </svg>
+      <div id="buddy" role="img" aria-label="Desktopity, a yellow smiley face">
+        <svg viewBox="0 0 100 100">
+          <defs>
+            <radialGradient id="skin" cx="38%" cy="30%" r="78%">
+              <stop offset="0" stop-color="#FFE64F"/><stop offset="0.55" stop-color="#F7D21A"/>
+              <stop offset="0.86" stop-color="#E6BC0C"/><stop offset="1" stop-color="#C99F06"/>
+            </radialGradient>
+            <radialGradient id="shine" cx="50%" cy="50%" r="50%">
+              <stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="50" cy="50" r="48" fill="url(#skin)"/>
+          <ellipse cx="34" cy="22" rx="13" ry="7" fill="url(#shine)" transform="rotate(-28 34 22)"/>
+          <g id="blush" opacity="0"><ellipse cx="25" cy="58" rx="6.5" ry="3.6" fill="#FF8A5B"/><ellipse cx="75" cy="58" rx="6.5" ry="3.6" fill="#FF8A5B"/></g>
+          <g id="eyes">
+            <g id="eOpen"><ellipse cx="39.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><ellipse cx="60.5" cy="38" rx="3.4" ry="6" fill="#120E05"/></g>
+            <g id="eHappy" opacity="0" fill="none" stroke="#120E05" stroke-width="2.5" stroke-linecap="round"><path d="M35.5,40 Q39.5,32.5 43.5,40"/><path d="M56.5,40 Q60.5,32.5 64.5,40"/></g>
+            <g id="eWink" opacity="0"><ellipse cx="39.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><path d="M66.5,33 L57,37.6 L66.5,41.4" fill="none" stroke="#120E05" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>
+          </g>
+          <g id="mSmile"><path d="M19,58 Q50,83 81,58 Q50,89.5 19,58 Z" fill="#120E05"/>
+            <path d="M16.4,54.4 Q18.6,58.2 19.2,61.4 M83.6,54.4 Q81.4,58.2 80.8,61.4" fill="none" stroke="#120E05" stroke-width="1.6" stroke-linecap="round"/></g>
+          <path id="mWavy" opacity="0" d="M29,67 Q33,63 38,65 Q44,67.6 48,65.4 Q54,62.6 62,63.6 L66,63 L68.4,58.6 L69.4,64 L71.4,66.4 M47,69.6 Q51,66.8 56,68.4" fill="none" stroke="#120E05" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <svg id="box" viewBox="0 0 140 124" aria-hidden="true">
+        <ellipse cx="70" cy="117" rx="64" ry="5" fill="#000" opacity="0.22"/>
+        <path id="flapL" d="M12,24 L70,24 L62,5 L5,7 Z" fill="#C8955A" stroke="#7A5428" stroke-width="1.4" stroke-linejoin="round"/>
+        <path id="flapR" d="M70,24 L128,24 L135,7 L78,5 Z" fill="#C8955A" stroke="#7A5428" stroke-width="1.4" stroke-linejoin="round"/>
+        <rect x="12" y="24" width="116" height="88" rx="2" fill="#B9844A" stroke="#7A5428" stroke-width="1.6"/>
+        <rect x="12" y="24" width="116" height="8" fill="#9E6D38" opacity="0.55"/>
+        <rect x="62" y="24" width="16" height="80" fill="#E3C38E" opacity="0.75"/>
+        <rect x="12" y="102" width="116" height="10" rx="2" fill="#8C5F31" stroke="#7A5428" stroke-width="1.6"/>
+      </svg>
+      <div class="icons" aria-hidden="true">
+        <div class="icon"><svg viewBox="0 0 40 40"><path d="M4 9h12l3 4h17v20H4z" fill="#F7C948"/><path d="M4 15h32v18H4z" fill="#FFD866"/></svg>homework</div>
+        <div class="icon"><svg viewBox="0 0 40 40"><path d="M9 4h16l7 7v25H9z" fill="#fff"/><path d="M25 4v7h7" fill="#D9E6E4"/><path d="M13 18h14M13 23h14M13 28h9" stroke="#9FB6B3" stroke-width="2"/></svg>pixels_counted.txt</div>
+        <div class="icon"><svg viewBox="0 0 40 40"><path d="M9 4h16l7 7v25H9z" fill="#fff"/><path d="M25 4v7h7" fill="#D9E6E4"/><path d="M13 18h14M13 23h14M13 28h9" stroke="#9FB6B3" stroke-width="2"/></svg>totally_not_evil_plans.txt</div>
+      </div>
+      <div class="say" id="say" aria-live="polite"></div>
+      <p class="hint" id="hint">Rub your mouse over him. Or poke him.</p>
+    </div>
+  </div>
+
+  <div class="taskbar">
+    <div class="taskbar-inner">
+      <svg class="tray-face" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#F7D21A"/><ellipse cx="39.5" cy="38" rx="4" ry="7" fill="#120E05"/><ellipse cx="60.5" cy="38" rx="4" ry="7" fill="#120E05"/><path d="M19,58 Q50,83 81,58 Q50,90 19,58 Z" fill="#120E05"/></svg>
+      <span>Desktopity</span>
+      <nav aria-label="Page sections">
+        <a href="#what">What he does</a>
+        <a href="#open">Opening him</a>
+        <a href="#private">Privacy</a>
+      </nav>
+      <span class="clock" id="clock" aria-hidden="true"></span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="what">
+    <h2>He's not an assistant. He's a buddy.</h2>
+    <p class="sub">He hangs out on your screen while you do your thing. Talk to him whenever you want — or ignore him, and see what happens.</p>
+    <ul class="traits">
+      <li>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#F7D21A"/><ellipse cx="39.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><ellipse cx="60.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><ellipse cx="50" cy="66" rx="6" ry="7" fill="#120E05"/></svg>
+        <div><h3>Just talk to him</h3><p>He listens on his own — no buttons — and answers out loud. Cut him off mid-sentence and he'll let you know he noticed.</p></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#F7D21A"/><g fill="#120E05"><path d="M30,34.5 Q38,32.5 45,35.6 Q44.2,39.6 41.3,40.4 Q34,40.6 31.2,37 Z"/><path d="M70,34.5 Q62,32.5 55,35.6 Q55.8,39.6 58.7,40.4 Q66,40.6 68.8,37 Z"/></g><path d="M40.5,69.6 Q50,65.4 59.5,68.6" fill="none" stroke="#120E05" stroke-width="2.6" stroke-linecap="round"/></svg>
+        <div><h3>He has moods</h3><p>Happy, grumpy, bored, sarcastic, hurt. Be nice and he's sweet. Poke him twenty times and you'll meet the other face.</p></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#F7D21A"/><g fill="none" stroke="#120E05" stroke-width="2.6" stroke-linecap="round"><path d="M35.5,40 Q39.5,32.5 43.5,40"/><path d="M56.5,40 Q60.5,32.5 64.5,40"/></g><g fill="#FF8A5B" opacity=".5"><ellipse cx="25" cy="58" rx="6.5" ry="3.6"/><ellipse cx="75" cy="58" rx="6.5" ry="3.6"/></g><path d="M17,56 Q50,84 83,56 Q50,93 17,56 Z" fill="#120E05"/></svg>
+        <div><h3>Pet him</h3><p>Rub your mouse back and forth over him. He likes that. A lot. It also snaps him out of anything creepy.</p></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#F7D21A"/><ellipse cx="39.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><ellipse cx="60.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><path d="M21,57 Q50,82 79,57 Q76,72 50,79 Q24,72 21,57 Z" fill="#120E05"/><path d="M24.5,59.5 Q50,78 75.5,59.5 L74,63.6 Q50,79.5 26,63.6 Z" fill="#fff"/></svg>
+        <div><h3>Slightly evil underneath</h3><p>Every so often a little sinister thought slips out. Then he says he was kidding. Mostly.</p></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#F7D21A"/><g fill="#120E05"><path d="M36.1,36 L42.9,36 Q43.2,43.6 39.5,44.2 Q35.8,43.6 36.1,36 Z"/><path d="M57.1,36 L63.9,36 Q64.2,43.6 60.5,44.2 Q56.8,43.6 57.1,36 Z"/></g><path d="M33.5,65.5 L66.5,65.5" stroke="#120E05" stroke-width="2.4" stroke-linecap="round"/></svg>
+        <div><h3>A life of his own</h3><p>He wanders around your screen, counts your pixels, and talks to himself when you walk away.</p></div>
+      </li>
+      <li>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#5ED36A"/><ellipse cx="39.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><path d="M66.5,33 L57,37.6 L66.5,41.4" fill="none" stroke="#120E05" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M19,58 Q50,83 81,58 Q50,89.5 19,58 Z" fill="#120E05"/></svg>
+        <div><h3>Make him yours</h3><p>Change his color, size, voice, speed and pitch. Turn the weirdness all the way up, or keep him just cute.</p></div>
+      </li>
+    </ul>
+  </section>
+
+  <section id="open">
+    <h2>Opening him the first time</h2>
+    <p class="sub">Desktopity is a free indie app, so Windows doesn't recognize him yet and shows a warning the first time. You only have to get past it once.</p>
+    <ol class="steps">
+      <li>
+        <h3>Extract the zip</h3>
+        <p>Right-click <b>Desktopity-Windows.zip</b> and choose <b>Extract All</b>. Then open the folder and double-click <b>Desktopity.exe</b>.</p>
+        <div class="shot"><div class="file"><img src="favicon.png" alt="">Desktopity.exe</div></div>
+      </li>
+      <li>
+        <h3>Click "More info"</h3>
+        <p>A blue box says "Windows protected your PC". That's normal for new apps. Click <b>More info</b>.</p>
+        <div class="shot win"><p class="t">Windows protected your PC</p>Microsoft Defender SmartScreen prevented an unrecognized app from starting.<br><span class="lnk ring">More info</span><div class="btns"><span class="b">Don't run</span></div></div>
+      </li>
+      <li>
+        <h3>Click "Run anyway"</h3>
+        <p>He pops out of his box. Allow the microphone if Windows asks, so he can hear you.</p>
+        <div class="shot win"><p class="t">Windows protected your PC</p>App: Desktopity.exe<div class="btns"><span class="b ring">Run anyway</span><span class="b hi">Don't run</span></div></div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="private">
+    <h2>He lives on your computer, not the cloud.</h2>
+    <p class="sub">Everything that makes him tick runs on your own PC.</p>
+    <div class="facts">
+      <div><h3>Private by default</h3><p>Speech recognition and his brain run offline. Nothing you say is recorded or uploaded.</p></div>
+      <div><h3>Works without internet</h3><p>After his one-time brain download, he doesn't need a connection at all.</p></div>
+      <div><h3>Easy to quit</h3><p>Right-click him, or use his icon in the system tray. He'll say bye. He won't make it weird.</p></div>
+    </div>
+  </section>
+
+  <div class="again">
+    <h2>Give your desktop a little company.</h2>
+    <a class="dl" href="#" data-file="Desktopity-Windows.zip">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0-4.5-4.5M12 14l4.5-4.5M4 17v3h16v-3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download for Windows
+    </a>
+  </div>
+</main>
+
+<footer>
+  <p>Desktopity is an original character and isn't affiliated with any other creator, game or company.</p>
+  <p>Made with open-source parts: Electron, sherpa-onnx, Silero VAD, Moonshine, Piper, and node-llama-cpp. His brain is Llama 3.2 by Meta — Built with Llama. Full credits are in CREDITS.txt inside the download.</p>
+</footer>
+
+<script>
+(() => {
+  // ---- download link: points at the latest GitHub release asset
+  const REPO = document.documentElement.dataset.repo || 'OWNER/desktopity';
+  for (const a of document.querySelectorAll('a[data-file]')) {
+    a.href = `https://github.com/${REPO}/releases/latest/download/${a.dataset.file}`;
+  }
+
+  // ---- taskbar clock
+  const clock = document.getElementById('clock');
+  const tick = () => { clock.textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); };
+  tick(); setInterval(tick, 20000);
+
+  // ---- the live buddy
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = id => document.getElementById(id);
+  const buddy = $('buddy'), box = $('box'), boxBack = $('boxBack'), flapL = $('flapL'), flapR = $('flapR');
+  const eyes = $('eyes'), eOpen = $('eOpen'), eHappy = $('eHappy'), eWink = $('eWink'), mSmile = $('mSmile'), mWavy = $('mWavy'), blush = $('blush');
+  const say = $('say'), hint = $('hint'), stage = $('stage');
+  let t0 = performance.now(), entering = !reduce, petting = 0, poked = 0, happy = 0, pokes = 0;
+  let mx = 0, my = 0, ex = 0, ey = 0, lastX = null, lastDir = 0, flips = [], acc = 0;
+
+  const ease = (c, t, r) => c + (t - c) * r;
+  const eo = k => 1 - Math.pow(1 - k, 3), ei = k => k * k * k;
+  function talk(text, ms = 2600) {
+    say.textContent = text; say.classList.add('show');
+    clearTimeout(talk.t); talk.t = setTimeout(() => say.classList.remove('show'), ms);
+  }
+
+  // entrance: box lands, jiggles, flaps open, he pops out and bounces down
+  function entrance(ms) {
+    const start = 62, apex = -150;
+    let y = start, sc = 0.72, rot = 0, op = 0, bs = 1, bo = 1, flap = 0, br = 0, by = 0;
+    if (ms < 260) { const k = ms / 260; bs = k < .7 ? eo(k / .7) * 1.12 : 1.12 - .12 * ((k - .7) / .3); bo = Math.min(1, k * 3); }
+    else if (ms < 560) { const k = (ms - 260) / 300; br = Math.sin(k * Math.PI * 4) * 5 * (1 - k); by = -Math.abs(Math.sin(k * Math.PI * 2)) * 4; }
+    if (ms >= 520) op = 1;
+    if (ms >= 560) flap = Math.min(1, (ms - 560) / 140);
+    if (ms >= 620 && ms < 1000) { const k = eo((ms - 620) / 380); y = start + (apex - start) * k; sc = .72 + .33 * k; rot = 24 * k; }
+    else if (ms >= 1000 && ms < 1380) { const k = ei((ms - 1000) / 380); y = apex * (1 - k); sc = 1.05 - .05 * k; rot = 24 * (1 - k); }
+    else if (ms >= 1380) { const b = ms - 1380; sc = 1; rot = 0; y = b < 320 ? -52 * 4 * (b / 320) * (1 - b / 320) : b < 560 ? -20 * 4 * ((b - 320) / 240) * (1 - (b - 320) / 240) : 0; }
+    if (ms >= 980) { const k = Math.min(1, (ms - 980) / 360); bs = 1 - .35 * k; bo = 1 - k; by = k * 50; }
+    const bt = `translateY(${by}px) rotate(${br}deg) scale(${bs})`;
+    box.style.opacity = boxBack.style.opacity = bo; box.style.transform = boxBack.style.transform = bt;
+    flapL.style.transform = `rotate(${-125 * flap}deg)`; flapR.style.transform = `rotate(${125 * flap}deg)`;
+    if (ms > 2000) { entering = false; box.style.opacity = boxBack.style.opacity = 0; hint.classList.add('show'); talk('Oh hey. You found me.', 3200); }
+    return { y, sc, rot, op };
+  }
+
+  function face(mode) {   // normal | happy | goofy
+    eOpen.style.opacity = mode === 'normal' ? 1 : 0;
+    eHappy.style.opacity = mode === 'happy' ? 1 : 0;
+    eWink.style.opacity = mode === 'goofy' ? 1 : 0;
+    mSmile.style.opacity = mode === 'goofy' ? 0 : 1;
+    mWavy.style.opacity = mode === 'goofy' ? 1 : 0;
+    blush.style.opacity = mode === 'happy' ? .42 : 0;
+  }
+
+  stage.addEventListener('pointermove', e => {
+    const r = buddy.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    mx = e.clientX - cx; my = e.clientY - cy;
+    // petting: rubbing back and forth across him
+    const over = Math.hypot(mx, my) < r.width / 2;
+    if (!over) { lastX = null; acc = 0; return; }
+    if (lastX !== null) {
+      const dx = e.clientX - lastX;
+      if (Math.abs(dx) > 1) { const d = Math.sign(dx); acc += Math.abs(dx); if (lastDir && d !== lastDir && acc > 25) { flips.push(performance.now()); acc = 0; } lastDir = d; }
+    }
+    lastX = e.clientX;
+    flips = flips.filter(t => performance.now() - t < 1500);
+    if (flips.length >= 3) { if (!petting) talk(['Ooh. Okay. I like that.', 'Hehe. Keep going.', 'That is very nice.'][Math.floor(Math.random() * 3)]); petting = performance.now(); }
+  });
+  stage.addEventListener('pointerleave', () => { mx = my = 0; lastX = null; });
+  buddy.addEventListener('click', () => {
+    pokes++; poked = performance.now();
+    const lines = pokes > 6 ? ['Okay. Stop poking me.', 'I will remember this.', 'Rude.'] : ['Boop.', 'Hey.', 'Yeah?', 'Hi. Hi.'];
+    talk(lines[Math.floor(Math.random() * lines.length)]);
+  });
+
+  let bob = 0;
+  function frame(now) {
+    requestAnimationFrame(frame);
+    let y = 0, sc = 1, rot = 0, op = 1;
+    if (entering) ({ y, sc, rot, op } = entrance(now - t0));
+    else if (!reduce) { bob += 0.016; y = -3 * (0.5 - 0.5 * Math.cos(bob * 1.8)); }
+    const isPet = now - petting < 700, isPoke = now - poked < 800;
+    happy = ease(happy, isPet ? 1 : 0, 0.15);
+    if (isPet && !reduce) { sc *= 1 + 0.04 * Math.sin(now / 120); rot += Math.sin(now / 240) * 3; }
+    if (isPoke) { const k = (now - poked) / 800; sc *= 1 - 0.08 * Math.sin(Math.min(1, k * 3) * Math.PI) * (1 - k); }
+    face(entering || isPoke ? 'goofy' : happy > 0.5 ? 'happy' : 'normal');
+    // eyes drift toward the cursor
+    const d = Math.hypot(mx, my) || 1, k = Math.min(1, d / 160);
+    ex = ease(ex, mx ? mx / d * 3.4 * k : 0, 0.12); ey = ease(ey, my ? my / d * 2.4 * k : 0, 0.12);
+    eyes.setAttribute('transform', `translate(${ex.toFixed(2)} ${ey.toFixed(2)})`);
+    buddy.style.opacity = op;
+    buddy.style.transform = `translateY(${y}px) rotate(${rot}deg) scale(${sc})`;
+  }
+  if (matchMedia('(pointer: coarse)').matches) hint.textContent = 'Tap him. Or rub him to pet him.';
+  if (reduce) { box.style.opacity = boxBack.style.opacity = 0; hint.classList.add('show'); }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

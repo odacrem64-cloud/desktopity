@@ -1,0 +1,25 @@
+Desktopity — credits and licenses
+==================================
+
+Desktopity is built with these open-source projects and models. Thank you to everyone who made them.
+
+App framework
+  Electron (MIT License) — https://www.electronjs.org
+
+Speech (offline, runs on your computer)
+  sherpa-onnx (Apache License 2.0) — https://github.com/k2-fsa/sherpa-onnx
+  ONNX Runtime (MIT License) — https://onnxruntime.ai
+  Silero VAD — voice activity detection (MIT License) — https://github.com/snakers4/silero-vad
+  Moonshine — speech recognition model by Useful Sensors (MIT License) — https://github.com/usefulsensors/moonshine
+  Piper TTS voice "en_US-libritts_r-medium" (MIT License, trained on LibriTTS-R, CC BY 4.0) — https://github.com/rhasspy/piper
+  espeak-ng data (GPL-3.0) — https://github.com/espeak-ng/espeak-ng
+
+Smart brain (downloaded on first launch)
+  node-llama-cpp / llama.cpp (MIT License) — https://github.com/withcatai/node-llama-cpp
+  Llama 3.2 3B Instruct / Llama 3.1 8B Instruct by Meta — Llama Community License
+  Built with Llama.  https://www.llama.com/llama3_2/license/
+
+Optional cloud voice
+  Fish Audio — https://fish.audio (uses your own account and API key; not included)
+
+Desktopity is an original character. It is not affiliated with or endorsed by any other creator, game or company.
