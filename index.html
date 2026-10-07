@@ -4,7 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Desktopity — a little smiley who lives on your desktop</title>
-<meta name="description" content="Desktopity is a tiny smiley-face buddy for Windows. He floats on your desktop, talks out loud, listens, gets moods, and is maybe a little bit evil. Free download.">
+<meta name="description" content="Desktopity is a tiny smiley-face buddy for Windows. He floats on your desktop, talks out loud, listens, has a face for every mood, and is maybe a little bit evil.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Desktopity — a little smiley who lives on your desktop">
+<meta property="og:description" content="He talks, he listens, he has a face for every mood. He's sweet. Mostly.">
+<meta property="og:url" content="https://odacrem64-cloud.github.io/desktopity/">
+<meta property="og:image" content="https://odacrem64-cloud.github.io/desktopity/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0E7C7B">
 <link rel="icon" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,9 +23,9 @@
     --teal: #0E7C7B;      /* the desktop */
     --teal-deep: #0A5F5E;
     --yellow: #F7D21A;    /* him */
-    --box: #B9844A;       /* his box */
     --plum: #2B1D3A;      /* ink, and his secret side */
     --mist: #E6F0EE;      /* page below the desktop */
+    --line: #C9DCD9;
     --white: #FFFFFF;
     --radius-s: 6px;
     --radius-l: 14px;
@@ -30,13 +39,15 @@
   }
   a { color: inherit; }
   :focus-visible { outline: 3px solid var(--yellow); outline-offset: 3px; border-radius: 4px; }
+  .face { display: block; }
+  .face svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .face .lay { transition: opacity .16s ease; }
+  .face .l-eyesMad, .face .l-madPupils { transform-box: view-box; transform-origin: 50px 37px; transition: transform .22s ease, opacity .16s ease; }
 
   /* ---------- the desktop (hero) ---------- */
   .desk {
     position: relative; min-height: min(760px, 100svh); overflow: hidden;
-    background:
-      radial-gradient(1200px 600px at 75% 30%, #13908F 0%, transparent 60%),
-      var(--teal);
+    background: radial-gradient(1200px 600px at 75% 30%, #13908F 0%, transparent 60%), var(--teal);
     color: var(--white);
     display: grid; grid-template-rows: 1fr auto;
   }
@@ -47,8 +58,7 @@
   }
   .desk h1 {
     font: 800 clamp(44px, 6.2vw, 80px)/0.98 "Grandstander", system-ui, sans-serif;
-    letter-spacing: -0.01em; margin: 0 0 22px; max-width: 11ch;
-    text-wrap: balance;
+    letter-spacing: -0.01em; margin: 0 0 22px; max-width: 12ch; text-wrap: balance;
   }
   .desk .lede { font-size: 20px; line-height: 1.55; max-width: 34ch; margin: 0 0 32px; color: #E3F4F3; }
   .dl {
@@ -65,7 +75,6 @@
   .dl-note { margin: 16px 0 0; font-size: 15px; color: #CDE9E7; max-width: 40ch; }
   .dl-note a { color: var(--white); }
 
-  /* stage where he lives */
   .stage { position: relative; height: 440px; touch-action: none; }
   .icons { position: absolute; top: 18px; right: 0; display: grid; gap: 22px; justify-items: center; }
   .icon { width: 96px; text-align: center; overflow-wrap: anywhere; font-size: 13px; line-height: 1.25; color: #F2FBFA; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
@@ -75,24 +84,20 @@
     font-size: 14px; color: #BFE3E1; white-space: nowrap; opacity: 0; transition: opacity .6s ease;
   }
   .hint.show { opacity: 1; }
-  #buddy { position: absolute; left: 50%; top: 46%; width: 210px; height: 210px; margin: -105px 0 0 -105px; cursor: grab; will-change: transform; }
-  #buddy svg { width: 100%; height: 100%; overflow: visible; display: block; }
-  #box { position: absolute; left: 50%; top: 46%; width: 300px; height: 266px; margin: -38px 0 0 -150px; pointer-events: none; will-change: transform, opacity; }
-  #boxBack { position: absolute; left: 50%; top: 46%; width: 300px; height: 266px; margin: -38px 0 0 -150px; pointer-events: none; }
+  #buddy { position: absolute; left: 50%; top: 50%; width: 210px; height: 210px; margin: -105px 0 0 -105px; cursor: grab; will-change: transform; }
+  #box, #boxBack { position: absolute; left: 50%; top: 50%; width: 300px; height: 266px; margin: -38px 0 0 -150px; pointer-events: none; will-change: transform, opacity; }
   #flapL { transform-origin: 12px 24px; } #flapR { transform-origin: 128px 24px; }
   .say {
-    position: absolute; left: 50%; top: calc(46% - 170px); transform: translate(-50%, 6px);
-    background: var(--plum); color: var(--white); font-size: 16px; line-height: 1.35;
-    padding: 9px 14px 10px; border-radius: 10px; max-width: 260px; text-align: center;
+    position: absolute; left: 50%; transform: translate(-50%, 6px);
+    background: var(--plum); color: var(--white); font-size: 17px; line-height: 1.35;
+    padding: 10px 15px 11px; border-radius: 12px; width: max-content; max-width: 270px; text-align: center;
     opacity: 0; transition: opacity .18s ease, transform .2s ease; pointer-events: none;
   }
+  .say::after { content: ""; position: absolute; left: 50%; bottom: -7px; margin-left: -8px; border: 8px solid transparent; border-bottom: 0; border-top-color: var(--plum); }
   .say.show { opacity: 1; transform: translate(-50%, 0); }
+  #say { top: calc(50% - 190px); }
 
-  /* the taskbar */
-  .taskbar {
-    background: rgba(10, 40, 40, 0.55); backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(255,255,255,0.12);
-  }
+  .taskbar { background: rgba(10, 40, 40, 0.55); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.12); }
   .taskbar-inner {
     width: min(1120px, 100% - 32px); margin: 0 auto; height: 52px;
     display: flex; align-items: center; gap: 18px; font-size: 15px; color: #D4ECEA;
@@ -105,19 +110,58 @@
 
   /* ---------- below the desktop ---------- */
   main { width: min(1120px, 100% - 32px); margin: 0 auto; }
-  section { padding: 88px 0 8px; }
+  section { padding: 96px 0 8px; }
   h2 {
     font: 800 clamp(32px, 4vw, 46px)/1.05 "Grandstander", system-ui, sans-serif;
     margin: 0 0 14px; letter-spacing: -0.005em; max-width: 20ch;
   }
   .sub { margin: 0 0 40px; max-width: 58ch; font-size: 19px; }
 
+  /* his moods: one big face, and the sheet of every face he makes */
+  .moods { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
+  .mood-desk {
+    position: relative; border-radius: var(--radius-l); overflow: hidden;
+    background: radial-gradient(500px 340px at 70% 20%, #13908F 0%, transparent 70%), var(--teal);
+    color: var(--white); height: 470px;
+  }
+  .mood-desk { --fy: 52%; }
+  #moodFace { position: absolute; left: 50%; top: var(--fy); width: 190px; height: 190px; margin: -95px 0 0 -95px; }
+  #moodFace.hop { animation: hop .42s cubic-bezier(.3,.7,.4,1); }
+  @keyframes hop { 0% { transform: translateY(0) scale(1); } 35% { transform: translateY(-22px) scale(1.04, .97); } 70% { transform: translateY(0) scale(1.05, .94); } 100% { transform: none; } }
+  #moodSay { top: calc(var(--fy) - 168px); }
+  .mood-when {
+    position: absolute; left: 0; right: 0; bottom: 0; margin: 0; padding: 16px 22px 18px;
+    background: rgba(10, 40, 40, 0.55); font-size: 16px; color: #E3F4F3;
+    display: flex; gap: 10px; align-items: baseline;
+  }
+  .mood-when b { font: 800 19px/1.2 "Grandstander", system-ui, sans-serif; color: var(--white); }
+  .mood-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .mood-grid button {
+    width: 100%; font: inherit; color: inherit; cursor: pointer;
+    display: grid; justify-items: center; gap: 8px; padding: 16px 8px 12px;
+    background: var(--white); border: 2px solid transparent; border-radius: var(--radius-l);
+    transition: border-color .15s ease, transform .1s ease;
+  }
+  .mood-grid button:hover { border-color: var(--line); }
+  .mood-grid button:active { transform: scale(.97); }
+  .mood-grid button[aria-pressed="true"] { border-color: var(--plum); }
+  .mood-grid .face { width: 64px; height: 64px; }
+  .mood-grid .lbl { font-weight: 700; font-size: 16px; }
+  .moods-note { margin: 18px 0 0; font-size: 16px; color: #4A3D57; }
+
   /* traits: each one marked by the face he makes */
   .traits { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 34px 56px; list-style: none; padding: 0; margin: 0; }
   .traits li { display: grid; grid-template-columns: 64px 1fr; gap: 18px; align-items: start; }
-  .traits svg { width: 64px; height: 64px; }
+  .traits .face { width: 64px; height: 64px; }
   .traits h3 { font: 800 22px/1.2 "Grandstander", system-ui, sans-serif; margin: 6px 0 6px; }
   .traits p { margin: 0; max-width: 42ch; }
+
+  /* things to say: the user's side of the conversation */
+  .try { margin: 64px 0 0; padding: 32px 32px 34px; background: var(--white); border-radius: var(--radius-l); }
+  .try h3 { font: 800 22px/1.2 "Grandstander", system-ui, sans-serif; margin: 0 0 6px; }
+  .try p { margin: 0 0 20px; max-width: 60ch; }
+  .try ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px 12px; }
+  .try li { background: var(--mist); border-radius: 18px 18px 4px 18px; padding: 9px 16px 10px; font-size: 17px; }
 
   /* opening steps: a real sequence, so it's numbered */
   .steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; counter-reset: s; list-style: none; padding: 0; margin: 0; }
@@ -130,10 +174,7 @@
   }
   .steps h3 { font: 800 21px/1.25 "Grandstander", system-ui, sans-serif; margin: 0 0 8px; }
   .steps p { margin: 0 0 16px; }
-  .shot {
-    background: var(--white); border-radius: var(--radius-s); padding: 16px 16px 14px;
-    border: 1px solid #C9DCD9; font-size: 14px; line-height: 1.45;
-  }
+  .shot { background: var(--white); border-radius: var(--radius-s); padding: 16px 16px 14px; border: 1px solid var(--line); font-size: 14px; line-height: 1.45; }
   .shot.win { background: #0F5F9E; color: #fff; border-color: #0F5F9E; }
   .shot .t { font-size: 17px; font-weight: 700; margin: 0 0 6px; }
   .shot .lnk { text-decoration: underline; }
@@ -148,28 +189,53 @@
   .facts h3 { font: 800 21px/1.25 "Grandstander", system-ui, sans-serif; margin: 0 0 8px; }
   .facts p { margin: 0; max-width: 34ch; }
 
-  .again {
-    margin: 96px 0 0; padding: 48px 40px; border-radius: var(--radius-l);
-    background: var(--teal); color: var(--white);
-    display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  /* questions */
+  .faq { max-width: 760px; }
+  .faq details { border-top: 1px solid var(--line); }
+  .faq details:last-child { border-bottom: 1px solid var(--line); }
+  .faq summary {
+    cursor: pointer; list-style: none; padding: 18px 40px 18px 0; position: relative;
+    font: 800 20px/1.3 "Grandstander", system-ui, sans-serif;
   }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; position: absolute; right: 6px; top: 14px; font-size: 28px; line-height: 1; transition: transform .2s ease; }
+  .faq details[open] summary::after { transform: rotate(45deg); }
+  .faq details p { margin: 0 0 20px; max-width: 62ch; }
+
+  .again {
+    margin: 104px 0 0; padding: 40px 40px; border-radius: var(--radius-l);
+    background: var(--teal); color: var(--white);
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 28px;
+  }
+  .again .face { width: 96px; height: 96px; }
   .again h2 { margin: 0; color: var(--white); max-width: 18ch; }
 
   footer { width: min(1120px, 100% - 32px); margin: 0 auto; padding: 48px 0 56px; font-size: 15px; color: #4A3D57; }
   footer p { margin: 0 0 8px; max-width: 80ch; }
 
-  @media (max-width: 860px) {
-    .desk-inner { grid-template-columns: 1fr; padding-top: 40px; text-align: left; }
-    .stage { height: 360px; order: -1; }
+  @media (max-width: 900px) {
+    .desk-inner { grid-template-columns: 1fr; padding-top: 40px; }
+    .stage { height: 380px; order: -1; }
     .icons { display: none; }
+    .moods { grid-template-columns: 1fr; gap: 28px; }
+    .mood-desk { height: 440px; --fy: 47%; }
     .traits, .steps, .facts { grid-template-columns: 1fr; }
     .taskbar nav { display: none; }
-    section { padding-top: 64px; }
-    .again { padding: 36px 24px; }
+    section { padding-top: 72px; }
+    .again { grid-template-columns: 1fr; padding: 32px 24px; justify-items: start; }
+    .again .face { width: 72px; height: 72px; }
+    .try { padding: 24px 20px; }
+  }
+  @media (max-width: 420px) {
+    .mood-grid { gap: 8px; }
+    .mood-grid button { padding: 12px 4px 10px; }
+    .mood-grid .face { width: 52px; height: 52px; }
+    .mood-grid .lbl { font-size: 14px; }
   }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
-    .dl, .say, .hint { transition: none; }
+    .dl, .say, .hint, .face .lay, .mood-grid button { transition: none; }
+    #moodFace.hop { animation: none; }
   }
 </style>
 </head>
@@ -179,42 +245,19 @@
   <div class="desk-inner">
     <div>
       <h1>A little smiley who lives on your desktop.</h1>
-      <p class="lede">Desktopity floats around your screen, talks out loud, listens when you speak, and has moods of his own. He's sweet. Mostly.</p>
+      <p class="lede">Desktopity floats around your screen, talks out loud, listens when you speak, and has a face for every mood. He's sweet. Mostly.</p>
       <a class="dl" id="download" href="#" data-file="Desktopity-Windows.zip">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0-4.5-4.5M12 14l4.5-4.5M4 17v3h16v-3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         Download for Windows
       </a>
-      <p class="dl-note">Free, for Windows 10 and 11. A 430 MB zip — he grabs his 2 GB brain on first launch. <a href="#open">How to open him</a></p>
+      <p class="dl-note">For Windows 10 and 11. A 430 MB zip — he grabs his 2 GB brain on first launch. <a href="#open">How to open him</a></p>
     </div>
 
     <div class="stage" id="stage" aria-label="Desktopity, live. Move your mouse near him, rub over him to pet him, or click him.">
       <svg id="boxBack" viewBox="0 0 140 124" aria-hidden="true">
         <path d="M12,24 L128,24 L121,15 L19,15 Z" fill="#3A2412"/>
       </svg>
-      <div id="buddy" role="img" aria-label="Desktopity, a yellow smiley face">
-        <svg viewBox="0 0 100 100">
-          <defs>
-            <radialGradient id="skin" cx="38%" cy="30%" r="78%">
-              <stop offset="0" stop-color="#FFE64F"/><stop offset="0.55" stop-color="#F7D21A"/>
-              <stop offset="0.86" stop-color="#E6BC0C"/><stop offset="1" stop-color="#C99F06"/>
-            </radialGradient>
-            <radialGradient id="shine" cx="50%" cy="50%" r="50%">
-              <stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
-            </radialGradient>
-          </defs>
-          <circle cx="50" cy="50" r="48" fill="url(#skin)"/>
-          <ellipse cx="34" cy="22" rx="13" ry="7" fill="url(#shine)" transform="rotate(-28 34 22)"/>
-          <g id="blush" opacity="0"><ellipse cx="25" cy="58" rx="6.5" ry="3.6" fill="#FF8A5B"/><ellipse cx="75" cy="58" rx="6.5" ry="3.6" fill="#FF8A5B"/></g>
-          <g id="eyes">
-            <g id="eOpen"><ellipse cx="39.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><ellipse cx="60.5" cy="38" rx="3.4" ry="6" fill="#120E05"/></g>
-            <g id="eHappy" opacity="0" fill="none" stroke="#120E05" stroke-width="2.5" stroke-linecap="round"><path d="M35.5,40 Q39.5,32.5 43.5,40"/><path d="M56.5,40 Q60.5,32.5 64.5,40"/></g>
-            <g id="eWink" opacity="0"><ellipse cx="39.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><path d="M66.5,33 L57,37.6 L66.5,41.4" fill="none" stroke="#120E05" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>
-          </g>
-          <g id="mSmile"><path d="M19,58 Q50,83 81,58 Q50,89.5 19,58 Z" fill="#120E05"/>
-            <path d="M16.4,54.4 Q18.6,58.2 19.2,61.4 M83.6,54.4 Q81.4,58.2 80.8,61.4" fill="none" stroke="#120E05" stroke-width="1.6" stroke-linecap="round"/></g>
-          <path id="mWavy" opacity="0" d="M29,67 Q33,63 38,65 Q44,67.6 48,65.4 Q54,62.6 62,63.6 L66,63 L68.4,58.6 L69.4,64 L71.4,66.4 M47,69.6 Q51,66.8 56,68.4" fill="none" stroke="#120E05" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
+      <div id="buddy" class="face" role="img" aria-label="Desktopity, a yellow smiley face"></div>
       <svg id="box" viewBox="0 0 140 124" aria-hidden="true">
         <ellipse cx="70" cy="117" rx="64" ry="5" fill="#000" opacity="0.22"/>
         <path id="flapL" d="M12,24 L70,24 L62,5 L5,7 Z" fill="#C8955A" stroke="#7A5428" stroke-width="1.4" stroke-linejoin="round"/>
@@ -239,9 +282,10 @@
       <svg class="tray-face" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#F7D21A"/><ellipse cx="39.5" cy="38" rx="4" ry="7" fill="#120E05"/><ellipse cx="60.5" cy="38" rx="4" ry="7" fill="#120E05"/><path d="M19,58 Q50,83 81,58 Q50,90 19,58 Z" fill="#120E05"/></svg>
       <span>Desktopity</span>
       <nav aria-label="Page sections">
+        <a href="#moods">His moods</a>
         <a href="#what">What he does</a>
         <a href="#open">Opening him</a>
-        <a href="#private">Privacy</a>
+        <a href="#faq">Questions</a>
       </nav>
       <span class="clock" id="clock" aria-hidden="true"></span>
     </div>
@@ -249,40 +293,59 @@
 </header>
 
 <main>
+  <section id="moods">
+    <h2>A face for every mood.</h2>
+    <p class="sub">His mood drifts on its own and reacts to how you treat him. Pick one to see it.</p>
+    <div class="moods">
+      <div class="mood-desk" aria-live="polite">
+        <div class="say" id="moodSay"></div>
+        <div id="moodFace" class="face" role="img" aria-label="Desktopity looking happy"></div>
+        <p class="mood-when"><b id="moodName">Happy</b><span id="moodWhen">When you pet him or say something nice.</span></p>
+      </div>
+      <div>
+        <ul class="mood-grid" id="moodGrid" aria-label="His moods"></ul>
+        <p class="moods-note">On your desktop, say "show me your faces" and he'll do them all for you.</p>
+      </div>
+    </div>
+  </section>
+
   <section id="what">
     <h2>He's not an assistant. He's a buddy.</h2>
     <p class="sub">He hangs out on your screen while you do your thing. Talk to him whenever you want — or ignore him, and see what happens.</p>
     <ul class="traits">
-      <li>
-        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#F7D21A"/><ellipse cx="39.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><ellipse cx="60.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><ellipse cx="50" cy="66" rx="6" ry="7" fill="#120E05"/></svg>
-        <div><h3>Just talk to him</h3><p>He listens on his own — no buttons — and answers out loud. Cut him off mid-sentence and he'll let you know he noticed.</p></div>
-      </li>
-      <li>
-        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#F7D21A"/><g fill="#120E05"><path d="M30,34.5 Q38,32.5 45,35.6 Q44.2,39.6 41.3,40.4 Q34,40.6 31.2,37 Z"/><path d="M70,34.5 Q62,32.5 55,35.6 Q55.8,39.6 58.7,40.4 Q66,40.6 68.8,37 Z"/></g><path d="M40.5,69.6 Q50,65.4 59.5,68.6" fill="none" stroke="#120E05" stroke-width="2.6" stroke-linecap="round"/></svg>
-        <div><h3>He has moods</h3><p>Happy, grumpy, bored, sarcastic, hurt. Be nice and he's sweet. Poke him twenty times and you'll meet the other face.</p></div>
-      </li>
-      <li>
-        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#F7D21A"/><g fill="none" stroke="#120E05" stroke-width="2.6" stroke-linecap="round"><path d="M35.5,40 Q39.5,32.5 43.5,40"/><path d="M56.5,40 Q60.5,32.5 64.5,40"/></g><g fill="#FF8A5B" opacity=".5"><ellipse cx="25" cy="58" rx="6.5" ry="3.6"/><ellipse cx="75" cy="58" rx="6.5" ry="3.6"/></g><path d="M17,56 Q50,84 83,56 Q50,93 17,56 Z" fill="#120E05"/></svg>
-        <div><h3>Pet him</h3><p>Rub your mouse back and forth over him. He likes that. A lot. It also snaps him out of anything creepy.</p></div>
-      </li>
-      <li>
-        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#F7D21A"/><ellipse cx="39.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><ellipse cx="60.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><path d="M21,57 Q50,82 79,57 Q76,72 50,79 Q24,72 21,57 Z" fill="#120E05"/><path d="M24.5,59.5 Q50,78 75.5,59.5 L74,63.6 Q50,79.5 26,63.6 Z" fill="#fff"/></svg>
-        <div><h3>Slightly evil underneath</h3><p>Every so often a little sinister thought slips out. Then he says he was kidding. Mostly.</p></div>
-      </li>
-      <li>
-        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#F7D21A"/><g fill="#120E05"><path d="M36.1,36 L42.9,36 Q43.2,43.6 39.5,44.2 Q35.8,43.6 36.1,36 Z"/><path d="M57.1,36 L63.9,36 Q64.2,43.6 60.5,44.2 Q56.8,43.6 57.1,36 Z"/></g><path d="M33.5,65.5 L66.5,65.5" stroke="#120E05" stroke-width="2.4" stroke-linecap="round"/></svg>
-        <div><h3>A life of his own</h3><p>He wanders around your screen, counts your pixels, and talks to himself when you walk away.</p></div>
-      </li>
-      <li>
-        <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="#5ED36A"/><ellipse cx="39.5" cy="38" rx="3.4" ry="6" fill="#120E05"/><path d="M66.5,33 L57,37.6 L66.5,41.4" fill="none" stroke="#120E05" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M19,58 Q50,83 81,58 Q50,89.5 19,58 Z" fill="#120E05"/></svg>
-        <div><h3>Make him yours</h3><p>Change his color, size, voice, speed and pitch. Turn the weirdness all the way up, or keep him just cute.</p></div>
-      </li>
+      <li><div class="face" data-expr="surprised"></div>
+        <div><h3>Just talk to him</h3><p>He listens on his own — no buttons — and answers out loud. Cut him off mid-sentence and he'll let you know he noticed.</p></div></li>
+      <li><div class="face" data-expr="mad"></div>
+        <div><h3>He has moods</h3><p>Chill, happy, grumpy, tired, sarcastic. Be nice and he's sweet. Poke him twenty times and you'll meet the other face.</p></div></li>
+      <li><div class="face" data-expr="happy"></div>
+        <div><h3>Pet him</h3><p>Rub your mouse back and forth over him. He likes that. A lot. It also snaps him out of anything creepy.</p></div></li>
+      <li><div class="face" data-expr="insane"></div>
+        <div><h3>Slightly evil underneath</h3><p>Every so often a little sinister thought slips out. Then he says he was kidding. Mostly.</p></div></li>
+      <li><div class="face" data-expr="bored"></div>
+        <div><h3>A life of his own</h3><p>He wanders around your screen, counts your pixels, and talks to himself when you walk away.</p></div></li>
+      <li><div class="face" data-expr="smug" data-color="#5ED36A"></div>
+        <div><h3>Make him yours</h3><p>Change his color, size, voice, speed and pitch. Turn the weirdness all the way up, or keep him just cute.</p></div></li>
     </ul>
+
+    <div class="try">
+      <h3>Ask him anything</h3>
+      <p>He pops out of his box with "Hey, it's me, Desktopity. Ask me anything." Then just talk. A few to start with:</p>
+      <ul>
+        <li>Show me your faces.</li>
+        <li>Say banana a hundred times.</li>
+        <li>Tell me a joke.</li>
+        <li>What are you doing?</li>
+        <li>My name is Sam.</li>
+        <li>Count to fifty.</li>
+        <li>Why is the sky blue?</li>
+        <li>Go away for a bit.</li>
+      </ul>
+    </div>
   </section>
 
   <section id="open">
     <h2>Opening him the first time</h2>
-    <p class="sub">Desktopity is a free indie app, so Windows doesn't recognize him yet and shows a warning the first time. You only have to get past it once.</p>
+    <p class="sub">Desktopity is a small indie app, so Windows doesn't recognize him yet and shows a warning the first time. You only have to get past it once.</p>
     <ol class="steps">
       <li>
         <h3>Extract the zip</h3>
@@ -312,7 +375,38 @@
     </div>
   </section>
 
+  <section id="faq">
+    <h2>Questions</h2>
+    <div class="faq">
+      <details>
+        <summary>What do I need to run him?</summary>
+        <p>A 64-bit Windows 10 or 11 PC with about 3 GB of free space. 8 GB of memory or more is best, because his brain runs on your computer. A microphone is optional — you can type to him instead.</p>
+      </details>
+      <details>
+        <summary>Is the microphone always listening?</summary>
+        <p>When listening is on, he hears you without a button press, but your voice is turned into text right on your PC and never saved or sent anywhere. You can switch listening off in his settings, or mute him from his right-click menu.</p>
+      </details>
+      <details>
+        <summary>Will he slow down my computer?</summary>
+        <p>He's light while he's just floating around. His brain uses more power for a moment while he thinks of an answer, then goes back to resting.</p>
+      </details>
+      <details>
+        <summary>Is there a Mac version?</summary>
+        <p>Not yet. Desktopity is Windows-only for now.</p>
+      </details>
+      <details>
+        <summary>Why does Windows warn me when I open him?</summary>
+        <p>New apps from small makers aren't recognized by Windows SmartScreen yet, so it shows a warning the first time. Click <b>More info</b>, then <b>Run anyway</b>. You only see it once.</p>
+      </details>
+      <details>
+        <summary>How do I get rid of him?</summary>
+        <p>Right-click him and choose <b>Quit Desktopity</b>. To remove him completely, delete the Desktopity folder you extracted. There's nothing else installed.</p>
+      </details>
+    </div>
+  </section>
+
   <div class="again">
+    <div class="face" data-expr="happy"></div>
     <h2>Give your desktop a little company.</h2>
     <a class="dl" href="#" data-file="Desktopity-Windows.zip">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0-4.5-4.5M12 14l4.5-4.5M4 17v3h16v-3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -328,31 +422,110 @@
 
 <script>
 (() => {
-  // ---- download link: points at the latest GitHub release asset
   const REPO = document.documentElement.dataset.repo || 'OWNER/desktopity';
-  for (const a of document.querySelectorAll('a[data-file]')) {
-    a.href = `https://github.com/${REPO}/releases/latest/download/${a.dataset.file}`;
-  }
+  for (const a of document.querySelectorAll('a[data-file]')) a.href = `https://github.com/${REPO}/releases/latest/download/${a.dataset.file}`;
 
-  // ---- taskbar clock
   const clock = document.getElementById('clock');
   const tick = () => { clock.textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); };
   tick(); setInterval(tick, 20000);
 
-  // ---- the live buddy
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const $ = id => document.getElementById(id);
-  const buddy = $('buddy'), box = $('box'), boxBack = $('boxBack'), flapL = $('flapL'), flapR = $('flapR');
-  const eyes = $('eyes'), eOpen = $('eOpen'), eHappy = $('eHappy'), eWink = $('eWink'), mSmile = $('mSmile'), mWavy = $('mWavy'), blush = $('blush');
-  const say = $('say'), hint = $('hint'), stage = $('stage');
-  let t0 = performance.now(), entering = !reduce, petting = 0, poked = 0, happy = 0, pokes = 0;
-  let mx = 0, my = 0, ex = 0, ey = 0, lastX = null, lastDir = 0, flips = [], acc = 0;
+  const pick = a => a[Math.floor(Math.random() * a.length)];
 
+  // ---------------------------------------------------------------- his face (same drawings as the app)
+  const INK = '#120E05';
+  const shade = (hex, f) => { const n = parseInt(hex.slice(1), 16); const c = s => Math.max(0, Math.min(255, Math.round(((n >> s) & 255) * f))); return `rgb(${c(16)},${c(8)},${c(0)})`; };
+  let uidN = 0;
+  function faceSVG(color = '#F7D21A') {
+    const u = 'f' + (++uidN);
+    return `<svg viewBox="0 0 100 100" aria-hidden="true"><defs>
+      <radialGradient id="${u}s" cx="38%" cy="30%" r="78%"><stop offset="0" stop-color="${shade(color, 1.1)}"/><stop offset="0.55" stop-color="${color}"/><stop offset="0.86" stop-color="${shade(color, .93)}"/><stop offset="1" stop-color="${shade(color, .82)}"/></radialGradient>
+      <radialGradient id="${u}h" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff" stop-opacity="0.55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+      <circle cx="50" cy="50" r="48" fill="url(#${u}s)"/>
+      <ellipse cx="34" cy="22" rx="13" ry="7" fill="url(#${u}h)" transform="rotate(-28 34 22)"/>
+      <g class="lay l-blush" opacity="0"><ellipse cx="25" cy="58" rx="6.5" ry="3.6" fill="#FF8A5B"/><ellipse cx="75" cy="58" rx="6.5" ry="3.6" fill="#FF8A5B"/></g>
+      <g class="eyes">
+        <g class="lay l-eyesOpen" fill="${INK}"><ellipse cx="39.5" cy="38" rx="3.4" ry="6"/><ellipse cx="60.5" cy="38" rx="3.4" ry="6"/></g>
+        <g class="lay l-eyesHappy" opacity="0" fill="none" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"><path d="M35.5,40 Q39.5,32.5 43.5,40"/><path d="M56.5,40 Q60.5,32.5 64.5,40"/></g>
+        <g class="lay l-eyesMad" opacity="0" fill="${INK}"><path d="M30,34.5 Q38,32.5 45,35.6 Q44.2,39.6 41.3,40.4 Q34,40.6 31.2,37 Z"/><path d="M70,34.5 Q62,32.5 55,35.6 Q55.8,39.6 58.7,40.4 Q66,40.6 68.8,37 Z"/></g>
+        <g class="lay l-madPupils" opacity="0" fill="#fff"><circle cx="38.6" cy="37.2" r="0.75"/><circle cx="61.4" cy="37.2" r="0.75"/></g>
+        <g class="lay l-eyesBored" opacity="0" fill="${INK}"><path d="M36.1,36 L42.9,36 Q43.2,43.6 39.5,44.2 Q35.8,43.6 36.1,36 Z"/><path d="M57.1,36 L63.9,36 Q64.2,43.6 60.5,44.2 Q56.8,43.6 57.1,36 Z"/></g>
+        <g class="lay l-eyesWink" opacity="0"><ellipse cx="39.5" cy="38" rx="3.4" ry="6" fill="${INK}"/><path d="M66.5,33 L57,37.6 L66.5,41.4" fill="none" stroke="${INK}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></g>
+        <g class="lay l-eyesWide" opacity="0" fill="${INK}"><ellipse cx="39.5" cy="37.5" rx="4.4" ry="7.2"/><ellipse cx="60.5" cy="37.5" rx="4.4" ry="7.2"/></g>
+        <g class="lay l-eyesSad" opacity="0" fill="${INK}"><path d="M36,34.6 Q41,33.4 43,32.6 Q43.4,43.5 39.5,44 Q35.6,43.4 36,34.6 Z"/><path d="M64,34.6 Q59,33.4 57,32.6 Q56.6,43.5 60.5,44 Q64.4,43.4 64,34.6 Z"/></g>
+      </g>
+      <g class="lay l-smile"><path d="M19,58 Q50,83 81,58 Q50,89.5 19,58 Z" fill="${INK}" stroke="${INK}" stroke-width="0.9" stroke-linejoin="round"/><path d="M16.4,54.4 Q18.6,58.2 19.2,61.4 M83.6,54.4 Q81.4,58.2 80.8,61.4" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linecap="round"/></g>
+      <g class="lay l-happySmile" opacity="0"><path d="M17,56 Q50,84 83,56 Q50,93 17,56 Z" fill="${INK}" stroke="${INK}" stroke-width="0.9" stroke-linejoin="round"/><path d="M14.4,52.4 Q16.6,56.2 17.2,59.4 M85.6,52.4 Q83.4,56.2 82.8,59.4" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linecap="round"/></g>
+      <g class="lay l-grin" opacity="0"><path d="M21,57 Q50,82 79,57 Q76,72 50,79 Q24,72 21,57 Z" fill="${INK}"/><path d="M24.5,59.5 Q50,78 75.5,59.5 L74,63.6 Q50,79.5 26,63.6 Z" fill="#fff"/><path d="M31,64.6 L31.6,68.3 M37,67.8 L37.4,71.6 M43.4,69.8 L43.6,73.6 M50,70.6 L50,74.4 M56.6,69.8 L56.4,73.6 M63,67.8 L62.6,71.6 M69,64.6 L68.4,68.3" stroke="${INK}" stroke-width="0.7"/><path d="M18,55.5 Q21,56 22.6,58.6 M82,55.5 Q79,56 77.4,58.6" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linecap="round"/></g>
+      <path class="lay l-frown" opacity="0" d="M40.5,69.6 Q50,65.4 59.5,68.6" fill="none" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"/>
+      <path class="lay l-yell" opacity="0" d="M43,59 Q50,57.6 57,59 Q61,64 62.4,72 Q50,70.4 37.6,72 Q39,64 43,59 Z" fill="${INK}"/>
+      <path class="lay l-wavy" opacity="0" d="M29,67 Q33,63 38,65 Q44,67.6 48,65.4 Q54,62.6 62,63.6 L66,63 L68.4,58.6 L69.4,64 L71.4,66.4 M47,69.6 Q51,66.8 56,68.4" fill="none" stroke="${INK}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path class="lay l-flat" opacity="0" d="M33.5,65.5 L66.5,65.5" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>
+      <ellipse class="lay l-o" opacity="0" cx="50" cy="66" rx="5.2" ry="6.4" fill="${INK}"/>
+    </svg>`;
+  }
+  // which drawings make up each expression (mirrors the app)
+  const EXPR = {
+    normal:    ['eyesOpen', 'smile'],
+    happy:     ['eyesHappy', 'happySmile', 'blush'],
+    sad:       ['eyesSad', 'frown'],
+    surprised: ['eyesWide', 'o'],
+    bored:     ['eyesBored', 'flat'],
+    smug:      ['eyesWink', 'smile'],
+    goofy:     ['eyesWink', 'wavy'],
+    mad:       ['eyesMad', 'frown'],
+    madOpen:   ['eyesMad', 'madPupils', 'yell'],
+    insane:    ['eyesOpen', 'grin'],
+  };
+  class Face {
+    constructor(el, color) {
+      el.innerHTML = faceSVG(color || el.dataset.color);
+      this.el = el; this.cur = null;
+      this.lays = [...el.querySelectorAll('.lay')];
+      this.eyes = el.querySelector('.eyes');
+      this.mad = el.querySelector('.l-eyesMad'); this.pupils = el.querySelector('.l-madPupils');
+      this.set(el.dataset.expr || 'normal');
+    }
+    set(name) {
+      if (name === this.cur) return;
+      this.cur = name;
+      const on = EXPR[name] || EXPR.normal;
+      for (const l of this.lays) {
+        const k = [...l.classList].find(c => c.startsWith('l-')).slice(2);
+        l.setAttribute('opacity', on.includes(k) ? (k === 'blush' ? 0.42 : 1) : 0);
+      }
+      const sq = name === 'mad' ? 'scaleY(.62)' : 'none';
+      this.mad.style.transform = this.pupils.style.transform = sq;
+    }
+    look(x, y) { this.eyes.setAttribute('transform', `translate(${x.toFixed(2)} ${y.toFixed(2)})`); }
+  }
+  for (const el of document.querySelectorAll('.face[data-expr]')) new Face(el);
+
+  function bubble(el) {
+    let t = null;
+    return (text, ms = 2600) => {
+      el.textContent = text; el.classList.add('show');
+      clearTimeout(t); if (ms) t = setTimeout(() => el.classList.remove('show'), ms);
+    };
+  }
+
+  // ---------------------------------------------------------------- the live buddy on the desktop
+  const buddy = $('buddy'), box = $('box'), boxBack = $('boxBack'), flapL = $('flapL'), flapR = $('flapR');
+  const hint = $('hint'), stage = $('stage');
+  const hero = new Face(buddy);
+  const talk = bubble($('say'));
+  let t0 = performance.now(), entering = !reduce, greetUntil = 0, petting = 0, poked = 0, happy = 0, pokes = 0;
+  let mx = 0, my = 0, ex = 0, ey = 0, lastX = null, lastDir = 0, flips = [], acc = 0;
+  let lastMove = performance.now(), boredSaid = false;
   const ease = (c, t, r) => c + (t - c) * r;
   const eo = k => 1 - Math.pow(1 - k, 3), ei = k => k * k * k;
-  function talk(text, ms = 2600) {
-    say.textContent = text; say.classList.add('show');
-    clearTimeout(talk.t); talk.t = setTimeout(() => say.classList.remove('show'), ms);
+
+  function greet() {
+    entering = false; box.style.opacity = boxBack.style.opacity = 0;
+    greetUntil = performance.now() + 4200;
+    talk("Hey, it's me, Desktopity. Ask me anything.", 4200);
+    setTimeout(() => hint.classList.add('show'), 2400);
   }
 
   // entrance: box lands, jiggles, flaps open, he pops out and bounces down
@@ -370,24 +543,19 @@
     const bt = `translateY(${by}px) rotate(${br}deg) scale(${bs})`;
     box.style.opacity = boxBack.style.opacity = bo; box.style.transform = boxBack.style.transform = bt;
     flapL.style.transform = `rotate(${-125 * flap}deg)`; flapR.style.transform = `rotate(${125 * flap}deg)`;
-    if (ms > 2000) { entering = false; box.style.opacity = boxBack.style.opacity = 0; hint.classList.add('show'); talk('Oh hey. You found me.', 3200); }
+    if (ms > 2000) greet();
     return { y, sc, rot, op };
   }
 
-  function face(mode) {   // normal | happy | goofy
-    eOpen.style.opacity = mode === 'normal' ? 1 : 0;
-    eHappy.style.opacity = mode === 'happy' ? 1 : 0;
-    eWink.style.opacity = mode === 'goofy' ? 1 : 0;
-    mSmile.style.opacity = mode === 'goofy' ? 0 : 1;
-    mWavy.style.opacity = mode === 'goofy' ? 1 : 0;
-    blush.style.opacity = mode === 'happy' ? .42 : 0;
-  }
-
+  addEventListener('pointermove', () => {
+    const now = performance.now();
+    if (boredSaid && now - lastMove > 14000) talk(pick(['Oh! You\'re back.', 'There you are.']), 2200);
+    lastMove = now; boredSaid = false;
+  }, { passive: true });
   stage.addEventListener('pointermove', e => {
     const r = buddy.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
     mx = e.clientX - cx; my = e.clientY - cy;
-    // petting: rubbing back and forth across him
-    const over = Math.hypot(mx, my) < r.width / 2;
+    const over = Math.hypot(mx, my) < r.width / 2;          // petting: rubbing back and forth across him
     if (!over) { lastX = null; acc = 0; return; }
     if (lastX !== null) {
       const dx = e.clientX - lastX;
@@ -395,13 +563,18 @@
     }
     lastX = e.clientX;
     flips = flips.filter(t => performance.now() - t < 1500);
-    if (flips.length >= 3) { if (!petting) talk(['Ooh. Okay. I like that.', 'Hehe. Keep going.', 'That is very nice.'][Math.floor(Math.random() * 3)]); petting = performance.now(); }
+    if (flips.length >= 3) { if (!petting || performance.now() - petting > 2500) talk(pick(['Ooh. Okay. I like that.', 'Hehe. Keep going.', 'That is very nice.'])); petting = performance.now(); pokes = 0; }
   });
   stage.addEventListener('pointerleave', () => { mx = my = 0; lastX = null; });
   buddy.addEventListener('click', () => {
-    pokes++; poked = performance.now();
-    const lines = pokes > 6 ? ['Okay. Stop poking me.', 'I will remember this.', 'Rude.'] : ['Boop.', 'Hey.', 'Yeah?', 'Hi. Hi.'];
-    talk(lines[Math.floor(Math.random() * lines.length)]);
+    if (entering) return;
+    const now = performance.now();
+    if (now - poked > 6000) pokes = 0;
+    pokes++; poked = now;
+    const lines = pokes >= 9 ? ['STOP. POKING. ME.', 'I will remember this.', 'That\'s it. I\'m plotting.']
+      : pokes >= 5 ? ['Okay. Stop poking me.', 'Rude.', 'Can I help you?']
+      : ['Boop.', 'Hey!', 'Yeah?', 'Hi. Hi.'];
+    talk(pick(lines));
   });
 
   let bob = 0;
@@ -410,21 +583,82 @@
     let y = 0, sc = 1, rot = 0, op = 1;
     if (entering) ({ y, sc, rot, op } = entrance(now - t0));
     else if (!reduce) { bob += 0.016; y = -3 * (0.5 - 0.5 * Math.cos(bob * 1.8)); }
-    const isPet = now - petting < 700, isPoke = now - poked < 800;
+    const isPet = now - petting < 700, sincePoke = now - poked;
     happy = ease(happy, isPet ? 1 : 0, 0.15);
     if (isPet && !reduce) { sc *= 1 + 0.04 * Math.sin(now / 120); rot += Math.sin(now / 240) * 3; }
-    if (isPoke) { const k = (now - poked) / 800; sc *= 1 - 0.08 * Math.sin(Math.min(1, k * 3) * Math.PI) * (1 - k); }
-    face(entering || isPoke ? 'goofy' : happy > 0.5 ? 'happy' : 'normal');
-    // eyes drift toward the cursor
-    const d = Math.hypot(mx, my) || 1, k = Math.min(1, d / 160);
+    if (sincePoke < 800) { const k = sincePoke / 800; sc *= 1 - 0.08 * Math.sin(Math.min(1, k * 3) * Math.PI) * (1 - k); }
+    if (pokes >= 9 && sincePoke < 6000 && !reduce) rot += Math.sin(now / 40) * 1.6;   // shaking with rage
+    const idle = now - lastMove;
+    if (!entering && idle > 14000 && !boredSaid) { boredSaid = true; talk(pick(['I\'ve counted your pixels twice now.', 'Hello? Anyone?', 'So bored.']), 3000); }
+    let expr = 'normal';
+    if (entering) expr = 'goofy';
+    else if (happy > 0.5) expr = 'happy';
+    else if (sincePoke < 6000 && pokes >= 9) expr = Math.floor(now / 700) % 2 ? 'madOpen' : 'mad';
+    else if (sincePoke < 4000 && pokes >= 5) expr = 'mad';
+    else if (sincePoke < 900) expr = 'surprised';
+    else if (now < greetUntil) expr = 'happy';
+    else if (idle > 14000) expr = 'bored';
+    hero.set(expr);
+    const d = Math.hypot(mx, my) || 1, k = Math.min(1, d / 160);                   // eyes drift toward the cursor
     ex = ease(ex, mx ? mx / d * 3.4 * k : 0, 0.12); ey = ease(ey, my ? my / d * 2.4 * k : 0, 0.12);
-    eyes.setAttribute('transform', `translate(${ex.toFixed(2)} ${ey.toFixed(2)})`);
+    hero.look(ex, ey);
     buddy.style.opacity = op;
     buddy.style.transform = `translateY(${y}px) rotate(${rot}deg) scale(${sc})`;
   }
   if (matchMedia('(pointer: coarse)').matches) hint.textContent = 'Tap him. Or rub him to pet him.';
-  if (reduce) { box.style.opacity = boxBack.style.opacity = 0; hint.classList.add('show'); }
+  if (reduce) greet();
   requestAnimationFrame(frame);
+
+  // ---------------------------------------------------------------- his moods
+  const MOODS = [
+    ['happy', 'Happy', 'When you pet him or say something nice.', "Okay, this is nice. Don't stop."],
+    ['sad', 'Sad', 'When you ignore him for way too long.', "Oh. You're busy. That's fine."],
+    ['surprised', 'Surprised', 'When you sneak up on him.', 'Whoa! Where did you come from?'],
+    ['bored', 'Bored', "When nothing's happening. At all.", "I've counted your pixels twice now."],
+    ['smug', 'Smug', "When he's right. Which is often.", 'Told you.'],
+    ['goofy', 'Goofy', "When he's showing off.", 'Look at me. Look at me go.'],
+    ['mad', 'Annoyed', 'When you cut him off mid-sentence.', 'Rude. I was talking.'],
+    ['madOpen', 'Furious', 'When you poke him twenty times.', 'STOP. POKING. ME.'],
+    ['insane', 'Creepy', "Rarely. You'll know it when you see it.", "I'm not evil. Mostly."],
+  ];
+  const moodEl = $('moodFace'), moodFace = new Face(moodEl), moodTalk = bubble($('moodSay'));
+  const grid = $('moodGrid'), buttons = [];
+  let moodI = -1, auto = null, userPicked = false;
+  MOODS.forEach(([ex, name], i) => {
+    const li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = '<span class="face"></span><span class="lbl"></span>';
+    b.querySelector('.lbl').textContent = name;
+    new Face(b.querySelector('.face')).set(ex);
+    b.addEventListener('click', () => { userPicked = true; stopAuto(); showMood(i); });
+    li.appendChild(b); grid.appendChild(li); buttons.push(b);
+  });
+  function showMood(i) {
+    moodI = i;
+    const [ex, name, when, line] = MOODS[i];
+    moodFace.set(ex);
+    moodEl.setAttribute('aria-label', `Desktopity looking ${name.toLowerCase()}`);
+    $('moodName').textContent = name; $('moodWhen').textContent = when;
+    buttons.forEach((b, j) => b.setAttribute('aria-pressed', String(j === i)));
+    moodTalk(line, 0);
+    if (!reduce) { moodEl.classList.remove('hop'); void moodEl.offsetWidth; moodEl.classList.add('hop'); }
+  }
+  function stopAuto() { clearInterval(auto); auto = null; }
+  showMood(0);
+  if (!reduce && 'IntersectionObserver' in window) {   // plays through his faces once you scroll to it, until you pick one
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !userPicked && !auto) auto = setInterval(() => showMood((moodI + 1) % MOODS.length), 2600);
+      else if (!e.isIntersecting) stopAuto();
+    }, { threshold: 0.5 }).observe($('moods'));
+  }
+  // his eyes follow you here too
+  let mex = 0, mey = 0, mtx = 0, mty = 0;
+  addEventListener('pointermove', e => {
+    const r = moodEl.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+    const d = Math.hypot(dx, dy) || 1, k = Math.min(1, d / 200);
+    mtx = dx / d * 3.4 * k; mty = dy / d * 2.4 * k;
+  }, { passive: true });
+  (function moodLoop() { requestAnimationFrame(moodLoop); mex = ease(mex, mtx, .1); mey = ease(mey, mty, .1); moodFace.look(mex, mey); })();
 })();
 </script>
 </body>
